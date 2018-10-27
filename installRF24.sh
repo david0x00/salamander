@@ -43,7 +43,7 @@ cd ..
 wget -O master.zip https://github.com/nRF24/RF24Mesh/archive/v1.0.51.zip
 unzip master.zip
 rm master.zip
-cd RF24Mesh-master
+cd RF24Mesh-1.0.51
 sudo make install
 cd ..
 
