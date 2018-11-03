@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/home/funkynoodles/Scripts/opendirectories'
+let g:netrw_dirhist_2='/home/funkynoodles/Scripts/opendirectories/65de6a'
+let g:netrw_dirhist_3='/home/funkynoodles/Scripts/opendirectories/test'
+let g:netrw_dirhist_4='/home/funkynoodles/Scripts'
+let g:netrw_dirhist_5='/home/funkynoodles/Pictures'
+let g:netrw_dirhist_6='/home/funkynoodles/Documents/ece445/ece445-camera/build/make.run.linux.x86_64'
+let g:netrw_dirhist_7='/home/funkynoodles/Resources'
+let g:netrw_dirhist_8='/usr/local/lib'
