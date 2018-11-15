@@ -37,17 +37,18 @@ RF24Mesh mesh(radio,network);
 bool amMaster = false;
 bool isPayloadToSend = false;
 unsigned int payloadDestination = 0;
-Payload rfMessageToSend;
+rf_comms_445::RFPayload rfMessageToSend;
 
 void rfSendCallback(const rf_comms_445::RFPayload::ConstPtr & msg) {
-	rfMessageToSend.messageType = msg->message_type;
-	rfMessageToSend.seqNum = msg->seq_num;
+	rfMessageToSend.message_type = msg->message_type;
+	rfMessageToSend.seq_num = msg->seq_num;
 	rfMessageToSend.x = msg->x;
 	rfMessageToSend.y = msg->y;
 	rfMessageToSend.orientation = msg->orientation;
-	rfMessageToSend.taskDone = msg->task_done;
-	rfMessageToSend.motorCmd = msg->motor_cmd;
-	rfMessageToSend.motorDuration = msg->motor_duration;
+	rfMessageToSend.task_done = msg->task_done;
+	rfMessageToSend.motor_cmd = msg->motor_cmd;
+	rfMessageToSend.motor_duration = msg->motor_duration;
+	rfMessageToSend.destination = msg->destination;
 	isPayloadToSend = true;
 	payloadDestination = msg->destination;
 }
@@ -92,12 +93,13 @@ int main(int argc, char **argv) {
 			RF24NetworkHeader header;
 			network.peek(header);
 
-			Payload payloadRecv;
+			rf_comms_445::RFPayload payloadRecv;
 			switch(header.type){
 				case 'M':
 				{
-					network.read(header, &payloadRecv, sizeof(Payload));
-					std::cout << "Recevied from " << header.from_node << " seq num " << payloadRecv.seqNum << std::endl;
+					network.read(header, &payloadRecv, sizeof(payloadRecv));
+					std::cout << "Recevied from " << header.from_node << " seq num " << payloadRecv.seq_num << std::endl;
+					rfPub.publish(payloadRecv);
 				} break;
 				default:
 					break;
@@ -109,7 +111,7 @@ int main(int argc, char **argv) {
 
 		// Check to send
 		if(isPayloadToSend){
-			if(mesh.write(&rfMessageToSend, 'M', sizeof(Payload), payloadDestination)){
+			if(mesh.write(&rfMessageToSend, 'M', sizeof(rfMessageToSend), payloadDestination)){
 				// Send okay
 				std::cout << "Sent okay to " << payloadDestination << std::endl;
 			}else{
