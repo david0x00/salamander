@@ -1,5 +1,5 @@
 #!/bin/sh
 
-echo $1 > ~/.salamanderNodeId
+echo $1 > /home/pi/.salamanderNodeId
 
 

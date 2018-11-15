@@ -68,6 +68,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	amMaster = (nodeId == 0);
+	std::cout << "Node ID " << nodeId <<std::endl;
 	// Setup RF24Mesh
 	mesh.setNodeID(nodeId);
 	mesh.begin();
@@ -119,7 +120,7 @@ int main(int argc, char **argv) {
 				// Check connectivity with the mesh network
 				if(!mesh.checkConnection()){
 					std::cout << "Mesh renewing address" << std::endl;
-					mesh.renewAddress();
+					//mesh.renewAddress();
 				}else{
 					std::cout << "Send failed to " << payloadDestination << std::endl;
 				}

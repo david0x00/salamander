@@ -67,9 +67,10 @@ int main(int argc, char **argv)
 
         chatter_pub.publish(msg);
 
+		// Master Test send
 		if(amMaster){
 			rf_comms_445::RFPayload payloadToSend;
-			payloadToSend.destination = 1;
+			payloadToSend.destination = 2;
 			payloadToSend.seq_num = count;
 			payloadToSend.x = 0;
 			payloadToSend.y = 0;
