@@ -16,13 +16,15 @@
 #include <fstream>
 #include <string>
 
-struct payload {
+struct Payload {
 	char messageType;
 	unsigned int seqNum;
 	float x;
 	float y;
 	float orientation;
 	bool taskDone;
+	unsigned short motorCmd;
+	unsigned int motorDuration;
 };
 
 
@@ -33,10 +35,21 @@ RF24Network network(radio);
 RF24Mesh mesh(radio,network);
 
 bool amMaster = false;
-std::string rfMessageToSend;
+bool isPayloadToSend = false;
+unsigned int payloadDestination = 0;
+Payload rfMessageToSend;
 
 void rfSendCallback(const rf_comms_445::RFPayload::ConstPtr & msg) {
-	//rfMessageToSend = msg->data;
+	rfMessageToSend.messageType = msg->message_type;
+	rfMessageToSend.seqNum = msg->seq_num;
+	rfMessageToSend.x = msg->x;
+	rfMessageToSend.y = msg->y;
+	rfMessageToSend.orientation = msg->orientation;
+	rfMessageToSend.taskDone = msg->task_done;
+	rfMessageToSend.motorCmd = msg->motor_cmd;
+	rfMessageToSend.motorDuration = msg->motor_duration;
+	isPayloadToSend = true;
+	payloadDestination = msg->destination;
 }
 
 int main(int argc, char **argv) {
@@ -74,11 +87,43 @@ int main(int argc, char **argv) {
 		if(amMaster){
 			mesh.DHCP();
 		}
-		while (network.available()){
+		// Check to receive
+		if (network.available()){
 			RF24NetworkHeader header;
+			network.peek(header);
+
+			Payload payloadRecv;
+			switch(header.type){
+				case 'M':
+				{
+					network.read(header, &payloadRecv, sizeof(Payload));
+					std::cout << "Recevied from " << header.from_node << " seq num " << payloadRecv.seqNum << std::endl;
+				} break;
+				default:
+					break;
+			}
 		}
 
+		// Get ROS messages
 		ros::spinOnce();
+
+		// Check to send
+		if(isPayloadToSend){
+			if(mesh.write(&rfMessageToSend, 'M', sizeof(Payload), payloadDestination)){
+				// Send okay
+				std::cout << "Sent okay to " << payloadDestination << std::endl;
+			}else{
+				// Send failed
+				// Check connectivity with the mesh network
+				if(!mesh.checkConnection()){
+					std::cout << "Mesh renewing address" << std::endl;
+					mesh.renewAddress();
+				}else{
+					std::cout << "Send failed to " << payloadDestination << std::endl;
+				}
+			}
+			isPayloadToSend = false;
+		}
 
 		loop_rate.sleep();
 	}

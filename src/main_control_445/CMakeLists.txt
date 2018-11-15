@@ -10,7 +10,9 @@ project(main_control_445)
 find_package(catkin REQUIRED COMPONENTS
             roscpp
             std_msgs
+			message_generation
             )
+find_package(rf_comms_445 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -104,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES main_control_445
-#  CATKIN_DEPENDS other_catkin_pkg
+	CATKIN_DEPENDS rf_comms_445
 #  DEPENDS system_lib
 )
 
@@ -117,6 +119,7 @@ catkin_package(
 include_directories(
 include
 ${catkin_INCLUDE_DIRS}
+${rf_comms_445_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
