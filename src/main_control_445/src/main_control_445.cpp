@@ -68,6 +68,7 @@ int main(int argc, char **argv)
             motorValue = 32;
         }
 
+		// Master Test send
 		if(amMaster){
 			uint8_t tmpDest = 2;
 			if(taskSent[tmpDest] == false){
