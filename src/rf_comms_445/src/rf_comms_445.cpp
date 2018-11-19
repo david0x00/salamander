@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	// get node ID from file
 	std::ifstream nodeIDFile;
 	std::string line;
-	int nodeId = 0;
+	unsigned int nodeId = 0;
 	nodeIDFile.open("/home/pi/.salamanderNodeId");
 	if(nodeIDFile.is_open()){
 		std::getline(nodeIDFile, line);
@@ -68,8 +68,9 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	amMaster = (nodeId == 0);
+	std::cout << "Node ID  " << nodeId << std::endl;
 	// Setup RF24Mesh
-	mesh.setNodeID(nodeId);
+	mesh.setNodeID((uint8_t)nodeId);
 	mesh.begin();
 	radio.printDetails();
 

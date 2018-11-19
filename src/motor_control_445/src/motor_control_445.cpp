@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include <std_msgs/Int16.h>
+#include <std_msgs/Int64.h>
 
 #include <wiringPi.h>
 #include <softPwm.h>
@@ -7,11 +7,14 @@
 // Pin number declarations. We're using the Broadcom chip pin numbers.
 const int pwmPin = 18; // PWM LED - Broadcom pin 18, P1 pin 12
 
-void motorControlCallback(const std_msgs::Int16::ConstPtr & msg) {
+ros::Publisher pub;
+
+void motorControlCallback(const std_msgs::Int64::ConstPtr & msg) {
     //ROS_INFO("I heard: [%c]", msg->data);
     unsigned char rightMotor = msg->data & 0x00FF;
     unsigned char leftMotor = msg->data >> 8;
-	ROS_INFO("%d", rightMotor & 0x40);
+	unsigned int duration = msg->data >> 16;
+	//ROS_INFO("%d", rightMotor & 0x40);
     if(rightMotor & 0x40 == 0){
         softPwmWrite(26, rightMotor & 0x3F);
         softPwmWrite(27, 0);
@@ -28,6 +31,15 @@ void motorControlCallback(const std_msgs::Int16::ConstPtr & msg) {
         softPwmWrite(28, 0);
         softPwmWrite(29, leftMotor & 0x3F);
     }
+
+	delay(duration);
+	softPwmWrite(26, 0);
+	softPwmWrite(27, 0);
+	softPwmWrite(28, 0);
+	softPwmWrite(29, 0);
+	// Send something back to say done
+	std_msgs::Int64 m;
+	pub.publish(m);
 }
 
 int main(int argc, char **argv) {
@@ -35,7 +47,8 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "motor_control");
     ros::NodeHandle n;
     ros::Subscriber sub = n.subscribe("motor_commands", 1000, motorControlCallback);
-    // Setup stuff:
+	pub = n.advertise<std_msgs::Int64>("motor_responses", 1000);
+    // Setup stuff
     wiringPiSetup(); // Initialize wiringPi -- using Broadcom pin numbers
 
     softPwmCreate(26, 0, 64);
