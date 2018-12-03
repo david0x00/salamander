@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 bool amMaster;
 bool newPayload = false;
@@ -61,21 +62,55 @@ int main(int argc, char **argv)
     ros::Rate loop_rate(1);
 
     int count = 0;
-    unsigned char motorValue = 32;
+    unsigned char motorValue = 48;
     while (ros::ok())
     {
-        if(motorValue == 55){
-            motorValue = 32;
-        }
+        //if(motorValue == 55){
+           // motorValue = 32;
+        //}
 
 		// Master Test send
 		if(amMaster){
-			uint8_t tmpDest = 2;
+			std::string inputCmd;
+			std::cin >> inputCmd;
+			uint8_t tmpDest = 0;
+			tmpDest = inputCmd[1];
+			char moveCmd = inputCmd[0];
+			bool leftForward = true;
+			bool rightForward = true;
+			switch (moveCmd) {
+				case 'w':
+					leftForward = true;
+					rightForward = true;
+					break;
+				case 's':
+					leftForward = false;
+					rightForward = false;
+					break;
+				case 'a':
+					leftForward = true;
+					rightForward = false;
+					break;
+				case 'd':
+					leftForward = false;
+					rightForward = true;
+					break;
+				default:
+					break;
+			}
+			std::cout << moveCmd << tmpDest << std::endl;
+
 			if(taskSent[tmpDest] == false){
-		        unsigned int motorCmd = 0;        
+		        unsigned int motorCmd = 0;
+				if(!rightForward){
+					motorCmd |= 0xC0;
+				}
 				motorCmd |= motorValue;
 		        motorCmd <<= 8;
-		        motorCmd |= 0xC0;
+
+				if(!leftForward){
+					motorCmd |= 0xC0;
+				}
 		        motorCmd |= motorValue;
 				rf_comms_445::RFPayload payloadToSend;
 				payloadToSend.source = 0;
@@ -88,7 +123,8 @@ int main(int argc, char **argv)
 				payloadToSend.motor_cmd = motorCmd;
 				payloadToSend.motor_duration = 500;
 				rfToSendPub.publish(payloadToSend);
-				taskSent[tmpDest] = true;
+				std::cout << "ready to send" <<std::endl;
+				//taskSent[tmpDest] = true;
 			}
 		}
 
