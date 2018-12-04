@@ -71,10 +71,10 @@ int main(int argc, char **argv)
 
 		// Master Test send
 		if(amMaster){
-			std::string inputCmd;
+			std::string inputCmd = "w2";
 			std::cin >> inputCmd;
 			uint8_t tmpDest = 0;
-			tmpDest = inputCmd[1];
+			tmpDest = inputCmd[1] - 48;
 			char moveCmd = inputCmd[0];
 			bool leftForward = true;
 			bool rightForward = true;
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 				default:
 					break;
 			}
-			std::cout << moveCmd << tmpDest << std::endl;
+			//std::cout << moveCmd << tmpDest << std::endl;
 
 			if(taskSent[tmpDest] == false){
 		        unsigned int motorCmd = 0;
@@ -123,7 +123,6 @@ int main(int argc, char **argv)
 				payloadToSend.motor_cmd = motorCmd;
 				payloadToSend.motor_duration = 500;
 				rfToSendPub.publish(payloadToSend);
-				std::cout << "ready to send" <<std::endl;
 				//taskSent[tmpDest] = true;
 			}
 		}
@@ -168,7 +167,6 @@ int main(int argc, char **argv)
 
         loop_rate.sleep();
         ++count;
-        motorValue++;
     }
 	delete taskSent;
     return 0;

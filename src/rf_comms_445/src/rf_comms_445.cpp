@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
 
 		// Check to send
 		if(isPayloadToSend){
+			std::cout << "Trying to send" << std::endl;
 			if(mesh.write(&rfMessageToSend, 'M', sizeof(rfMessageToSend), payloadDestination)){
 				// Send okay
 				std::cout << "Sent okay to " << payloadDestination << std::endl;
