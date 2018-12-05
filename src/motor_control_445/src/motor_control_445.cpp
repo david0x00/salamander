@@ -3,6 +3,7 @@
 
 #include <wiringPi.h>
 #include <softPwm.h>
+#include <iostream>
 
 // Pin number declarations. We're using the Broadcom chip pin numbers.
 const int pwmPin = 18; // PWM LED - Broadcom pin 18, P1 pin 12
@@ -14,8 +15,11 @@ void motorControlCallback(const std_msgs::Int64::ConstPtr & msg) {
     unsigned char rightMotor = msg->data & 0x00FF;
     unsigned char leftMotor = msg->data >> 8;
 	unsigned int duration = msg->data >> 16;
-	//ROS_INFO("%d", rightMotor & 0x40);
-    if(rightMotor & 0x40 == 0){
+	//ROS_INFO("%d", leftMotor & 0x3F);
+	//ROS_INFO("%d", rightMotor & 0x3F);
+	std::cout << (int)rightMotor << std::endl;
+	std::cout << (int)leftMotor << std::endl;
+    if((int)rightMotor == 240){
         softPwmWrite(26, rightMotor & 0x3F);
         softPwmWrite(27, 0);
 		std::cout << "Should not be here" <<std::endl;
@@ -24,7 +28,7 @@ void motorControlCallback(const std_msgs::Int64::ConstPtr & msg) {
         softPwmWrite(27, rightMotor & 0x3F);
     }
 
-    if(leftMotor & 0x40 == 0){
+    if((int)leftMotor == 240){
         softPwmWrite(28, leftMotor & 0x3F);
         softPwmWrite(29, 0);
     } else {
